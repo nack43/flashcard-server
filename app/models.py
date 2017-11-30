@@ -68,3 +68,17 @@ class User(db.Model):
         return "<User: {}>".format(self.id)
 
 
+class Word(db.Model):
+    __tablename__ = 'words'
+    id = db.Column(db.Integer, primary_key=True)
+    front = db.Column(db.String(256), nullable=False)
+    back = db.Column(db.String(256), nullable=False)
+
+    def __init__(self, front, back):
+        self.front = front
+        self.back = back
+
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
