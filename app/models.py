@@ -15,6 +15,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(256), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
+    access_token = db.Column(db.String(256), nullable=True)
 
     def __init__(self, email, password):
         self.email = email
@@ -33,7 +34,6 @@ class User(db.Model):
     def generate_token(self, user_id):
         try:
             payload = {
-                'exp': datetime.utcnow() + timedelta(minutes=5),
                 'iat': datetime.utcnow(),
                 'sub': user_id
             }
@@ -43,7 +43,8 @@ class User(db.Model):
                 current_app.config.get('SECRET'),
                 algorithm='HS256'
             )
-            print(jwt_string)
+
+            self.access_token = jwt_string
 
             return jwt_string
 
@@ -64,6 +65,6 @@ class User(db.Model):
 
 
     def __repr__(self):
-        return "<User: {}>".format(self.name)
+        return "<User: {}>".format(self.id)
 
 

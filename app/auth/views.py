@@ -49,14 +49,13 @@ class LoginView(MethodView):
             user = User.query.filter_by(email=request.data['email']).first()
 
             if user and user.password_is_valid(request.data['password']):
-                access_token = user.generate_token(user.id)
-                print(access_token)
-                print(type(access_token))
-                if access_token:
+                user.generate_token(user.id)
+                if user.access_token:
                     response = {
                         'message': 'You logged in successfully.',
-                        'access_token': access_token.decode()
+                        'access_token': user.access_token.decode()
                     }
+                    user.save()
                     return make_response(jsonify(response)), 200
             else:
 
