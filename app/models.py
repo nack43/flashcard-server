@@ -16,6 +16,8 @@ class User(db.Model):
     email = db.Column(db.String(256), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
     access_token = db.Column(db.String(256), nullable=True)
+    words = db.relationship(
+        'Word', order_by='Word.id', cascade="all, delete-orphan")
 
     def __init__(self, email, password):
         self.email = email
@@ -68,17 +70,33 @@ class User(db.Model):
         return "<User: {}>".format(self.id)
 
 
+class Part_of_speech(db.Model):
+    __tablename__ = 'part_of_speeches'
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(20), nullable=False)
+    words = db.relationship(
+        'Word', order_by='Word.id', cascade="all, delete-orphan")
+
+
 class Word(db.Model):
     __tablename__ = 'words'
     id = db.Column(db.Integer, primary_key=True)
     front = db.Column(db.String(256), nullable=False)
     back = db.Column(db.String(256), nullable=False)
+    wight = db.Column(db.Integer, nullable=False)
+    related_word_1 = db.Column(db.String(256), nullable=False)
+    related_word_2 = db.Column(db.String(256), nullable=False)
+    related_word_3 = db.Column(db.String(256), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
+    part_of_speech = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
 
     def __init__(self, front, back):
         self.front = front
         self.back = back
+        self.wight = 0
 
 
     def save(self):
         db.session.add(self)
         db.session.commit()
+
