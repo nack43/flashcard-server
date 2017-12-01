@@ -21,22 +21,19 @@ class WordTestCase(unittest.TestCase):
 
 
     def test_word_registration(self):
-        res = self.client().post('/word/register', data=self.word_data)
-        result = json.loads(res.data.decode())
+        """Testing for word registration normally."""
+        res = self.client().post(
+                '/word/register', 
+                data=self.word_data,
+                headers=dict(Authorization="Bearer " + access_token)
+                )
 
-        self.assertEqual(result['message'], 'Registered Successfully.')
+        # convert response to json format
+        res_json = json.loads(res.data.decode())
+
+        self.assertEqual(res_json['message'], 'Registered Successfully.')
+        self.assertEqual(res_json['front'], '你好')
+        self.assertEqual(res_json['back'], 'こんにちは')
         self.assertEqual(res.status_code, 201)
 
-
-    def test_get_all_words(self):
-        # word registration
-        res = self.client().post('/word/register', data=self.word_data)
-        result = json.loads(res.data.decode())
-        self.assertEqual(res.status_code, 201)
-        # get all words 
-        res_get = self.client().get('/word', headers=dict(Authorization="Bearer " + access_token))
-        result_get = json.loads(res.data.decode())
-
-        self.assertEqual(res_get.status_code, 200)
-        self.assertIn('你好', str(res_get.data))
 
