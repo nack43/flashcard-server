@@ -1,34 +1,41 @@
-from . import word_blueprint
+from . import word
 
 from flask.views import MethodView
 from flask import Blueprint, make_response, request, jsonify
-from app.models import Word
+from app.models import Word, User
 
 
-class RegistrationView(MethodView):
+@word.route('/word/register', methods=['POST'])
+def word_register():
+    auth_header = request.headers.get('Authorization')
+    access_token = auth_header.split(' ')[1]
 
-    def post(self):
-        auth_header = request.headers.get('Authorization')
-        access_token = auth_header.split(' ')[1]
-        # access_token validation 
-        if access_token:
-            user_id = User.decode_token(access_token)
+    if access_token:
+        user_id = User.decode_token(access_token)
 
-            if not isinstance(user_id, str):
-                # handle pattern of the authenticated user
-                front = request.data.get('front', '')
-                back = request.data.get('back', '')
+        if not isinstance(user_id, str):
+            # handle pattern of the authenticated user
+            front = request.data.get('front', '')
+            back = request.data.get('back', '')
+            part_of_speech_id = request.data.get('part_of_speech_id', '')
 
-                word = Word(front=front, back=back)
-                word.save()
+            word = Word(
+                    front=front,
+                    back=back,
+                    created_by=user_id,
+                    part_of_speech_id=part_of_speech_id
+                )
 
-                return 201
+            word.save()
 
-registration_view = RegistrationView.as_view('register_view')
+            response = {
+                'message': 'Registered Successfully.',
+                'front': front,
+                'back': back,
+                'created_by': user_id,
+                'part_of_speech_id': part_of_speech_id
+            }
 
-word_blueprint.add_url_rule(
-    '/word/register',
-    view_func=registration_view,
-    methods=['POST']
-}
+            return make_response(jsonify(response)), 201
+
 

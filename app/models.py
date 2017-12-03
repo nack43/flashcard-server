@@ -77,6 +77,11 @@ class Part_of_speech(db.Model):
     words = db.relationship(
         'Word', order_by='Word.id', cascade="all, delete-orphan")
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+
 
 class Word(db.Model):
     __tablename__ = 'words'
@@ -84,16 +89,18 @@ class Word(db.Model):
     front = db.Column(db.String(256), nullable=False)
     back = db.Column(db.String(256), nullable=False)
     wight = db.Column(db.Integer, nullable=False)
-    related_word_1 = db.Column(db.String(256), nullable=False)
-    related_word_2 = db.Column(db.String(256), nullable=False)
-    related_word_3 = db.Column(db.String(256), nullable=False)
+    related_word_1 = db.Column(db.String(256), nullable=True)
+    related_word_2 = db.Column(db.String(256), nullable=True)
+    related_word_3 = db.Column(db.String(256), nullable=True)
     created_by = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
-    part_of_speech = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
+    part_of_speech_id = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
 
-    def __init__(self, front, back):
+    def __init__(self, front, back, created_by, part_of_speech_id):
         self.front = front
         self.back = back
         self.wight = 0
+        self.created_by = created_by
+        self.part_of_speech_id = part_of_speech_id
 
 
     def save(self):
