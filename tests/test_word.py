@@ -3,7 +3,7 @@ import unittest
 import json
 
 from app import create_app, db
-from app.models import Part_of_speech
+from app.models import Part_of_speech, Choice
 class WordTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -25,9 +25,18 @@ class WordTestCase(unittest.TestCase):
             db.drop_all()
             db.create_all()
 
-            # insert test recode
+            # insert test recode for POS
             pos = Part_of_speech(type='noun')
             pos.save()
+
+            # insert test recode for Choice
+            choice_1 = Choice(choice='ニーチェ', pos_id=1)
+            choice_2 = Choice(choice='ハイデガー', pos_id=1)
+            choice_3 = Choice(choice='サルトル', pos_id=1)
+            choice_1.save()
+            choice_2.save()
+            choice_3.save()
+            
 
     def sign_up(self):
         return self.client().post('/auth/register', data=self.user_data)

@@ -1,4 +1,5 @@
 # standard library
+import random
 from datetime import datetime, timedelta
 # third party library
 import jwt
@@ -16,8 +17,7 @@ class User(db.Model):
     email = db.Column(db.String(256), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
     access_token = db.Column(db.String(256), nullable=True)
-    words = db.relationship(
-        'Word', order_by='Word.id', cascade="all, delete-orphan")
+    words = db.relationship('Word')
 
     def __init__(self, email, password):
         self.email = email
@@ -74,10 +74,8 @@ class Part_of_speech(db.Model):
     __tablename__ = 'part_of_speeches'
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(20), nullable=False)
-    words = db.relationship(
-        'Word', order_by='Word.id', cascade="all, delete-orphan")
-    choices = db.relationship(
-        'Choice', order_by='Choice.id', cascade="all, delete-orphan")
+    words = db.relationship('Word')
+    choices = db.relationship('Choice')
 
 
     def save(self):
@@ -89,9 +87,13 @@ class Choice(db.Model):
     __tablename__ = 'choices'
     id = db.Column(db.Integer, primary_key=True)
     choice = db.Column(db.String(256), nullable=False)
-    part_of_speech_id = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
-    words = db.relationship(
-        'Word', order_by='Word.id', cascade="all, delete-orphan")
+    pos_id = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
+#    words = db.relationship('Word')
+
+    # for testing
+    def __init__(self, choice, pos_id):
+        self.choice = choice
+        self.pos_id = pos_id
 
     def save(self):
         db.session.add(self)
@@ -104,18 +106,29 @@ class Word(db.Model):
     front = db.Column(db.String(256), nullable=False)
     back = db.Column(db.String(256), nullable=False)
     wight = db.Column(db.Integer, nullable=False)
-    choice_1 = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
-    choice_2 = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
-    choice_3 = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
+    choice_1_id = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
+    choice_2_id = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
+    choice_3_id = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
-    part_of_speech_id = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
+    pos_id = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
 
-    def __init__(self, front, back, created_by, part_of_speech_id):
+    choice_1 = db.relationship('Choice', foreign_keys=[choice_1_id])
+    choice_2 = db.relationship('Choice', foreign_keys=[choice_2_id])
+    choice_3 = db.relationship('Choice', foreign_keys=[choice_3_id])
+
+    def __init__(self, front, back, created_by, pos_id):
         self.front = front
         self.back = back
         self.wight = 0
         self.created_by = created_by
-        self.part_of_speech_id = part_of_speech_id
+        self.pos_id = pos_id
+
+    def choice_determination(self, pos_id):
+        choice_list = Choice.query.filter_by(pos_id=pos_id).all()
+        random.shuffle(choice_list)
+        self.choice_1_id = choice_list[0].id
+        self.choice_2_id = choice_list[1].id
+        self.choice_3_id = choice_list[2].id
 
 
     def save(self):
