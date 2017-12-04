@@ -76,11 +76,26 @@ class Part_of_speech(db.Model):
     type = db.Column(db.String(20), nullable=False)
     words = db.relationship(
         'Word', order_by='Word.id', cascade="all, delete-orphan")
+    choices = db.relationship(
+        'Choice', order_by='Choice.id', cascade="all, delete-orphan")
+
 
     def save(self):
         db.session.add(self)
         db.session.commit()
 
+
+class Choice(db.Model):
+    __tablename__ = 'choices'
+    id = db.Column(db.Integer, primary_key=True)
+    choice = db.Column(db.String(256), nullable=False)
+    part_of_speech_id = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
+    words = db.relationship(
+        'Word', order_by='Word.id', cascade="all, delete-orphan")
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class Word(db.Model):
@@ -89,9 +104,9 @@ class Word(db.Model):
     front = db.Column(db.String(256), nullable=False)
     back = db.Column(db.String(256), nullable=False)
     wight = db.Column(db.Integer, nullable=False)
-    related_word_1 = db.Column(db.String(256), nullable=True)
-    related_word_2 = db.Column(db.String(256), nullable=True)
-    related_word_3 = db.Column(db.String(256), nullable=True)
+    choice_1 = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
+    choice_2 = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
+    choice_3 = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
     part_of_speech_id = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
 
