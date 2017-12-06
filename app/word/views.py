@@ -17,7 +17,7 @@ def word_register():
             # handle pattern of the authenticated user
             front = request.data.get('front', '')
             back = request.data.get('back', '')
-            pos_id = request.data.get('part_of_speech_id', '')
+            pos_id = request.data.get('pos_id', '')
 
             word = Word(
                     front=front,
@@ -34,7 +34,7 @@ def word_register():
                 'front': front,
                 'back': back,
                 'created_by': user_id,
-                'part_of_speech_id': pos_id
+                'pos_id': pos_id
             }
 
             return make_response(jsonify(response)), 201

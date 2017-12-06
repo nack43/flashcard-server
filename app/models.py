@@ -119,7 +119,7 @@ class Word(db.Model):
     def __init__(self, front, back, created_by, pos_id):
         self.front = front
         self.back = back
-        self.wight = 0
+        self.weight = 0
         self.created_by = created_by
         self.pos_id = pos_id
 

@@ -12,13 +12,13 @@ class WordTestCase(unittest.TestCase):
         self.word_data = {
             'front': '你好',
             'back': 'こんにちは',
-            'part_of_speech_id': 1
+            'pos_id': 1
         }
         
         self.word_data_2 = {
             'front': '早晨', 
             'back': 'おはよう',
-            'part_of_speech_id': 1
+            'pos_id': 1
         }
 
         self.user_data = {
