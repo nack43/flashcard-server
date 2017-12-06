@@ -105,7 +105,7 @@ class Word(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     front = db.Column(db.String(256), nullable=False)
     back = db.Column(db.String(256), nullable=False)
-    wight = db.Column(db.Integer, nullable=False)
+    weight = db.Column(db.Integer, nullable=False)
     choice_1_id = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
     choice_2_id = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
     choice_3_id = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
