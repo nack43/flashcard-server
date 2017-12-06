@@ -14,6 +14,12 @@ class WordTestCase(unittest.TestCase):
             'back': 'こんにちは',
             'part_of_speech_id': 1
         }
+        
+        self.word_data_2 = {
+            'front': '早晨', 
+            'back': 'おはよう',
+            'part_of_speech_id': 1
+        }
 
         self.user_data = {
             'email': 'test@test.com',
@@ -67,4 +73,33 @@ class WordTestCase(unittest.TestCase):
         self.assertEqual(res_json['back'], 'こんにちは')
         self.assertEqual(res.status_code, 201)
 
+
+    def test_get_all_words(self):
+        """Testing for getting all words user have"""
+        self.sign_up()
+        login_res = self.login()
+        access_token = json.loads(login_res.data.decode())['access_token']
+        
+        res_post = self.client().post(
+                '/word/register', 
+                data=self.word_data,
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        
+        res_post_2 = self.client().post(
+                '/word/register', 
+                data=self.word_data_2,
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+
+        res_get = self.client().get(
+                '/word/all',
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        
+        res_json = json.loads(res_get.data.decode())
+
+        self.assertIn(res_json[0]['front'], '你好')
+        self.assertIn(res_json[1]['front'], '早晨')
+        self.assertEqual(res_get.status_code, 200)
 

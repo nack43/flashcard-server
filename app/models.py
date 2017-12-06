@@ -130,6 +130,10 @@ class Word(db.Model):
         self.choice_2_id = choice_list[1].id
         self.choice_3_id = choice_list[2].id
 
+    @staticmethod
+    def get_all(user_id):
+        return Word.query.filter_by(created_by=user_id).all()
+
 
     def save(self):
         db.session.add(self)
