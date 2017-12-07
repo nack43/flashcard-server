@@ -32,8 +32,10 @@ class WordTestCase(unittest.TestCase):
             db.create_all()
 
             # insert test recode for POS
-            pos = Part_of_speech(type='noun')
-            pos.save()
+            pos_1 = Part_of_speech(type='noun')
+            pos_2 = Part_of_speech(type='verb')
+            pos_1.save()
+            pos_2.save()
 
             # insert test recode for Choice
             choice_1 = Choice(choice='ニーチェ', pos_id=1)
@@ -102,4 +104,30 @@ class WordTestCase(unittest.TestCase):
         self.assertIn(res_json[0]['front'], '你好')
         self.assertIn(res_json[1]['front'], '早晨')
         self.assertEqual(res_get.status_code, 200)
+
+    
+    def test_get_all_pos(self):
+        """Testing for getting all pos (part of spheeches)"""
+        self.sign_up()
+        login_res = self.login()
+        access_token = json.loads(login_res.data.decode())['access_token']
+
+        print(access_token)
+
+        res = self.client().get(
+            '/word/pos_all',
+            headers=dict(Authorization="Bearer " + access_token)
+            )
+
+        res_json = json.loads(res.data.decode())
+
+        self.assertEqual(res_json[0]['id'], 1)
+        self.assertEqual(res_json[0]['type'], 'noun')
+        self.assertEqual(res_json[1]['id'], 2)
+        self.assertEqual(res_json[1]['type'], 'verb')
+        self.assertEqual(res.status_code, 200)
+
+            
+
+
 

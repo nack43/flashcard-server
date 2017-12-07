@@ -77,6 +77,9 @@ class Part_of_speech(db.Model):
     words = db.relationship('Word')
     choices = db.relationship('Choice')
 
+    @staticmethod
+    def get_all_pos():
+        return Part_of_speech.query.all()
 
     def save(self):
         db.session.add(self)
@@ -133,7 +136,6 @@ class Word(db.Model):
     @staticmethod
     def get_all(user_id):
         return Word.query.filter_by(created_by=user_id).all()
-
 
     def save(self):
         db.session.add(self)
