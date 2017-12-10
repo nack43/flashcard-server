@@ -84,3 +84,22 @@ def get_all_pos():
             
             return make_response(jsonify(pos_list)), 200
 
+
+@word.route('/word/test_result', methods=['POST'])
+def get_test_result():
+    auth_header = request.headers.get('Authorization')
+    access_token = auth_header.split(' ')[1]
+
+    if access_token:
+        user_id = User.decode_token(access_token)
+
+        if not isinstance(user_id, str):
+            request_json = request.get_json()
+            for answer in request_json.values():
+                if answer['is_correct'] == False:
+                    word = Word.query.filter_by(id=answer['word_id']).first()
+                    word.weight = word.weight + 1
+                    word.save()
+
+            return 'Successfully'
+

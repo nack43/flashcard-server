@@ -1,9 +1,9 @@
-#standard library
 import unittest
 import json
 
 from app import create_app, db
 from app.models import Part_of_speech, Choice
+
 class WordTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -20,11 +20,50 @@ class WordTestCase(unittest.TestCase):
             'back': 'おはよう',
             'pos_id': 1
         }
+        self.word_data_3 = {
+            'front': '多謝',
+            'back': 'ありがとう',
+            'pos_id': 1
+        }
+
+        self.word_data_4 = {
+            'front': '早抖',
+            'back': 'おやすみ',
+            'pos_id': 1
+        }
+        self.word_data_5 = {
+            'front': '日文',
+            'back': '日本語',
+            'pos_id': 1
+        }
 
         self.user_data = {
             'email': 'test@test.com',
             'password': 'test'
         }
+
+        self.test_result = {
+                1: {
+                    'word_id': 1, 
+                    'is_correct': True
+                    },
+                2: {
+                    'word_id': 2,
+                    'is_correct': True
+                    },
+                3: {
+                    'word_id': 3,
+                    'is_correct': False
+                    },
+                4: {
+                    'word_id': 4,
+                    'is_correct': False
+                    },
+                5: {
+                    'word_id': 5,
+                    'is_correct': False
+                    }
+                }
 
         with self.app.app_context():
             db.session.close()
@@ -68,7 +107,6 @@ class WordTestCase(unittest.TestCase):
 
         # convert response to json format
         res_json = json.loads(res.data.decode())
-        print(res_json)
 
         self.assertEqual(res_json['message'], 'Registered Successfully.')
         self.assertEqual(res_json['front'], '你好')
@@ -112,8 +150,6 @@ class WordTestCase(unittest.TestCase):
         login_res = self.login()
         access_token = json.loads(login_res.data.decode())['access_token']
 
-        print(access_token)
-
         res = self.client().get(
             '/word/pos_all',
             headers=dict(Authorization="Bearer " + access_token)
@@ -127,7 +163,48 @@ class WordTestCase(unittest.TestCase):
         self.assertEqual(res_json[1]['type'], 'verb')
         self.assertEqual(res.status_code, 200)
 
-            
 
+    def test_receive_test_result(self):
+        """Tesgin for receiving test result."""
+
+        self.sign_up()
+        login_res = self.login()
+        access_token = json.loads(login_res.data.decode())['access_token']
+        
+        res_1 = self.client().post(
+                '/word/register', 
+                data=self.word_data,
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        res_2 = self.client().post(
+                '/word/register', 
+                data=self.word_data_2,
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        res_3 = self.client().post(
+                '/word/register', 
+                data=self.word_data_3,
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        res_4 = self.client().post(
+                '/word/register', 
+                data=self.word_data_4,
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+        res_5 = self.client().post(
+                '/word/register', 
+                data=self.word_data_5,
+                headers=dict(Authorization="Bearer " + access_token)
+                )
+
+
+        res_6 = self.client().post(
+            '/word/test_result',
+            data=json.dumps(dict(self.test_result)),
+            content_type='application/json',
+            headers=dict(Authorization="Bearer " + access_token)
+            )
+
+        self.assertEqual(res_6.status_code, 200)
 
 
