@@ -54,8 +54,15 @@ def get_all_words():
 
             for word in words:
                 element = {
+                    'id': word.id,
                     'front': word.front,
-                    'back': word.back
+                    'back': word.back,
+                    'weight': word.weight,
+                    'choice_1_id': word.choice_1_id,
+                    'choice_2_id': word.choice_2_id,
+                    'choice_3_id': word.choice_3_id,
+                    'created_by': word.created_by,
+                    'pos_id': word.pos_id
                 }
                 
                 word_list.append(element)
