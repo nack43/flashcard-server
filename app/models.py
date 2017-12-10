@@ -18,6 +18,8 @@ class User(db.Model):
     password = db.Column(db.String(256), nullable=False)
     access_token = db.Column(db.String(256), nullable=True)
     words = db.relationship('Word')
+    created_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, email, password):
         self.email = email
@@ -76,6 +78,8 @@ class Part_of_speech(db.Model):
     type = db.Column(db.String(20), nullable=False)
     words = db.relationship('Word')
     choices = db.relationship('Choice')
+    created_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @staticmethod
     def get_all_pos():
@@ -91,7 +95,8 @@ class Choice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     choice = db.Column(db.String(256), nullable=False)
     pos_id = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
-#    words = db.relationship('Word')
+    created_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # for testing
     def __init__(self, choice, pos_id):
@@ -114,6 +119,8 @@ class Word(db.Model):
     choice_3_id = db.Column(db.Integer, db.ForeignKey(Choice.id), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
     pos_id = db.Column(db.Integer, db.ForeignKey(Part_of_speech.id), nullable=False)
+    created_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     choice_1 = db.relationship('Choice', foreign_keys=[choice_1_id])
     choice_2 = db.relationship('Choice', foreign_keys=[choice_2_id])
