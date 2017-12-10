@@ -5,7 +5,7 @@ from flask import Blueprint, make_response, request, jsonify
 from app.models import Word, User, Part_of_speech
 
 
-@word.route('/word/register', methods=['POST'])
+@word.route('/v1/word/register', methods=['POST'])
 def word_register():
     auth_header = request.headers.get('Authorization')
     access_token = auth_header.split(' ')[1]
@@ -40,7 +40,7 @@ def word_register():
             return make_response(jsonify(response)), 201
 
 
-@word.route('/word/all', methods=['GET'])
+@word.route('/v1/word/all', methods=['GET'])
 def get_all_words():
     auth_header = request.headers.get('Authorization')
     access_token = auth_header.split(' ')[1]
@@ -69,7 +69,7 @@ def get_all_words():
 
             return make_response(jsonify(word_list)), 200
 
-@word.route('/word/pos_all', methods=['GET'])
+@word.route('/v1/word/pos_all', methods=['GET'])
 def get_all_pos():
     auth_header = request.headers.get('Authorization')
     access_token = auth_header.split(' ')[1]
@@ -92,7 +92,7 @@ def get_all_pos():
             return make_response(jsonify(pos_list)), 200
 
 
-@word.route('/word/test_result', methods=['POST'])
+@word.route('/v1/word/test_result', methods=['POST'])
 def get_test_result():
     auth_header = request.headers.get('Authorization')
     access_token = auth_header.split(' ')[1]

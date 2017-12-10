@@ -86,11 +86,11 @@ class WordTestCase(unittest.TestCase):
             
 
     def sign_up(self):
-        return self.client().post('/auth/register', data=self.user_data)
+        return self.client().post('/v1/auth/register', data=self.user_data)
 
 
     def login(self):
-        return self.client().post('/auth/login', data=self.user_data)
+        return self.client().post('/v1/auth/login', data=self.user_data)
 
 
     def test_word_registration(self):
@@ -100,7 +100,7 @@ class WordTestCase(unittest.TestCase):
         access_token = json.loads(login_res.data.decode())['access_token']
 
         res = self.client().post(
-                '/word/register', 
+                '/v1/word/register', 
                 data=self.word_data,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
@@ -121,19 +121,19 @@ class WordTestCase(unittest.TestCase):
         access_token = json.loads(login_res.data.decode())['access_token']
         
         res_post = self.client().post(
-                '/word/register', 
+                '/v1/word/register', 
                 data=self.word_data,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         
         res_post_2 = self.client().post(
-                '/word/register', 
+                '/v1/word/register', 
                 data=self.word_data_2,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
 
         res_get = self.client().get(
-                '/word/all',
+                '/v1/word/all',
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         
@@ -151,7 +151,7 @@ class WordTestCase(unittest.TestCase):
         access_token = json.loads(login_res.data.decode())['access_token']
 
         res = self.client().get(
-            '/word/pos_all',
+            '/v1/word/pos_all',
             headers=dict(Authorization="Bearer " + access_token)
             )
 
@@ -172,34 +172,34 @@ class WordTestCase(unittest.TestCase):
         access_token = json.loads(login_res.data.decode())['access_token']
         
         res_1 = self.client().post(
-                '/word/register', 
+                '/v1/word/register', 
                 data=self.word_data,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         res_2 = self.client().post(
-                '/word/register', 
+                '/v1/word/register', 
                 data=self.word_data_2,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         res_3 = self.client().post(
-                '/word/register', 
+                '/v1/word/register', 
                 data=self.word_data_3,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         res_4 = self.client().post(
-                '/word/register', 
+                '/v1/word/register', 
                 data=self.word_data_4,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         res_5 = self.client().post(
-                '/word/register', 
+                '/v1/word/register', 
                 data=self.word_data_5,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
 
 
         res_6 = self.client().post(
-            '/word/test_result',
+            '/v1/word/test_result',
             data=json.dumps(dict(self.test_result)),
             content_type='application/json',
             headers=dict(Authorization="Bearer " + access_token)
