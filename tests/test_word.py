@@ -75,7 +75,6 @@ class WordTestCase(unittest.TestCase):
             pos_2 = Part_of_speech(type='verb')
             pos_1.save()
             pos_2.save()
-            print(pos_1.created_date)
 
             # insert test recode for Choice
             choice_1 = Choice(choice='ニーチェ', pos_id=1)
@@ -101,7 +100,7 @@ class WordTestCase(unittest.TestCase):
         access_token = json.loads(login_res.data.decode())['access_token']
 
         res = self.client().post(
-                '/v1/word/register', 
+                '/v1/words', 
                 data=self.word_data,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
@@ -122,19 +121,19 @@ class WordTestCase(unittest.TestCase):
         access_token = json.loads(login_res.data.decode())['access_token']
         
         res_post = self.client().post(
-                '/v1/word/register', 
+                '/v1/words', 
                 data=self.word_data,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         
         res_post_2 = self.client().post(
-                '/v1/word/register', 
+                '/v1/words', 
                 data=self.word_data_2,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
 
         res_get = self.client().get(
-                '/v1/word/all',
+                '/v1/words',
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         
@@ -152,7 +151,7 @@ class WordTestCase(unittest.TestCase):
         access_token = json.loads(login_res.data.decode())['access_token']
 
         res = self.client().get(
-            '/v1/word/pos_all',
+            '/v1/poses',
             headers=dict(Authorization="Bearer " + access_token)
             )
 
@@ -173,34 +172,34 @@ class WordTestCase(unittest.TestCase):
         access_token = json.loads(login_res.data.decode())['access_token']
         
         res_1 = self.client().post(
-                '/v1/word/register', 
+                '/v1/words', 
                 data=self.word_data,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         res_2 = self.client().post(
-                '/v1/word/register', 
+                '/v1/words', 
                 data=self.word_data_2,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         res_3 = self.client().post(
-                '/v1/word/register', 
+                '/v1/words', 
                 data=self.word_data_3,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         res_4 = self.client().post(
-                '/v1/word/register', 
+                '/v1/words', 
                 data=self.word_data_4,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         res_5 = self.client().post(
-                '/v1/word/register', 
+                '/v1/words', 
                 data=self.word_data_5,
                 headers=dict(Authorization="Bearer " + access_token)
                 )
 
 
         res_6 = self.client().post(
-            '/v1/word/test_result',
+            '/v1/tests',
             data=json.dumps(dict(self.test_result)),
             content_type='application/json',
             headers=dict(Authorization="Bearer " + access_token)
