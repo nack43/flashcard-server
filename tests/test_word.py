@@ -75,6 +75,7 @@ class WordTestCase(unittest.TestCase):
             pos_2 = Part_of_speech(type='verb')
             pos_1.save()
             pos_2.save()
+            print(pos_1.created_date)
 
             # insert test recode for Choice
             choice_1 = Choice(choice='ニーチェ', pos_id=1)
@@ -86,11 +87,11 @@ class WordTestCase(unittest.TestCase):
             
 
     def sign_up(self):
-        return self.client().post('/v1/auth/register', data=self.user_data)
+        return self.client().post('/v1/users', data=self.user_data)
 
 
     def login(self):
-        return self.client().post('/v1/auth/login', data=self.user_data)
+        return self.client().post('/v1/users/login', data=self.user_data)
 
 
     def test_word_registration(self):

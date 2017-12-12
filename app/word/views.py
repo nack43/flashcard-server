@@ -102,6 +102,7 @@ def get_test_result():
 
         if not isinstance(user_id, str):
             request_json = request.get_json()
+            print(request_json)
             for answer in request_json.values():
                 if answer['is_correct'] == False:
                     word = Word.query.filter_by(id=answer['word_id']).first()

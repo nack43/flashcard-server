@@ -16,9 +16,9 @@ def create_app(config_name):
     db.init_app(app)
 
     # import the authentication blueprint and register it on the app
-    from .auth import auth_blueprint
+    from .user import user_blueprint
     from .word import word
-    app.register_blueprint(auth_blueprint)
+    app.register_blueprint(user_blueprint)
     app.register_blueprint(word)
 
     return app

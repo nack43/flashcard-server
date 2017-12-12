@@ -1,4 +1,4 @@
-from . import auth_blueprint
+from . import user_blueprint
 from flask.views import MethodView
 from flask import make_response, request, jsonify
 from app.models import User
@@ -7,7 +7,7 @@ from app.models import User
 class RegistrationView(MethodView):
 
     def post(self):
-        """Handle POST request for this view. Url ---> /auth/register"""
+        """Handle POST request for this view. Url ---> /v1/users"""
 
         user = User.query.filter_by(email=request.data['email']).first()
 
@@ -38,13 +38,13 @@ class RegistrationView(MethodView):
                 'message': 'User already exists. Please login.'
             }
 
-            return make_response(jsonify(response)), 202
+            return make_response(jsonify(response)), 409
 
 class LoginView(MethodView):
     """This class-based view handles user login and access token generation."""
 
     def post(self):
-        """Handle POST request for this view. Url ---> /auth/login"""
+        """Handle POST request for this view. Url ---> /v1/users/login"""
         try:
             user = User.query.filter_by(email=request.data['email']).first()
 
@@ -75,18 +75,18 @@ class LoginView(MethodView):
 registration_view = RegistrationView.as_view('register_view')
 login_view = LoginView.as_view('login_view')
 
-# Define the rule for the registration url ---> /auth/register
+# Define the rule for the registration url ---> /v1/users
 # Then add the rule to the blueprint
-auth_blueprint.add_url_rule(
-    '/v1/auth/register',
+user_blueprint.add_url_rule(
+    '/v1/users',
     view_func=registration_view,
     methods=['POST']
 )
 
-# Define the rule for the registration url ---> /auth/login
+# Define the rule for the registration url ---> /v1/users/login
 # Then add the rule to the blueprint
-auth_blueprint.add_url_rule(
-    '/v1/auth/login',
+user_blueprint.add_url_rule(
+    '/v1/users/login',
     view_func=login_view,
     methods=['POST']
 )
