@@ -1,3 +1,4 @@
+from flask_api import status
 from . import user_blueprint
 from flask.views import MethodView
 from flask import make_response, request, jsonify
@@ -8,37 +9,26 @@ class RegistrationView(MethodView):
 
     def post(self):
         """Handle POST request for this view. Url ---> /v1/users"""
+        content = request.get_json()
+        email = content['email'] 
+        password = content['password']
 
-        user = User.query.filter_by(email=request.data['email']).first()
+        user = User.query.filter_by(email=email).first()
 
         if not user:
 
-            try:
-                post_data = request.data
+            new_user = User(email=email, password=password)
+            new_user.save()
 
-                email = post_data['email']
-                password = post_data['password']
-                user = User(email=email, password=password)
-                user.save()
+            return '', status.HTTP_201_CREATED
 
-                response = {
-                    'message': 'Registered successfully.'
-                }
-
-                return make_response(jsonify(response)), 201
-            except Exception as e:
-                response = {
-                    'message': str(e)
-                }
-
-                return make_response(jsonify(response)), 401
         else:
 
             response = {
                 'message': 'User already exists. Please login.'
             }
 
-            return make_response(jsonify(response)), 409
+            return jsonify(response), status.HTTP_409_CONFLICT
 
 class LoginView(MethodView):
     """This class-based view handles user login and access token generation."""

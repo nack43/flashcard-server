@@ -86,7 +86,11 @@ class WordTestCase(unittest.TestCase):
             
 
     def sign_up(self):
-        return self.client().post('/v1/users', data=self.user_data)
+        return self.client().post(
+                '/v1/users',
+                content_type='application/json',
+                data=json.dumps(self.user_data)
+                )
 
 
     def login(self):

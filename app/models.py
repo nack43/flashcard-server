@@ -16,7 +16,6 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(256), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
-    access_token = db.Column(db.String(256), nullable=True)
     words = db.relationship('Word')
     created_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modified_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
