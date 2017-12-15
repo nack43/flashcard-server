@@ -6,7 +6,7 @@ import json
 from app import create_app, db
 
 
-class AuthTestCase(unittest.TestCase):
+class UserTestCase(unittest.TestCase):
     """Test case for the authentication blueprint."""
 
     def setUp(self):
@@ -17,7 +17,7 @@ class AuthTestCase(unittest.TestCase):
         # test password and email definition
         self.user_data = {
             'email': 'test@test.com',
-            'password': 'test_password'
+            'password': 'test'
         }
 
         with self.app.app_context():
@@ -28,29 +28,41 @@ class AuthTestCase(unittest.TestCase):
 
     def test_registration(self):
         """Test user registration works correctly."""
-        res = self.client().post('/v1/users', data=self.user_data)
-        # convert api resonse to json format
-        result = json.loads(res.data.decode())
+        res = self.client().post(
+                '/v1/users',
+                content_type='application/json',
+                data=json.dumps(self.user_data)
+                )
 
-        self.assertEqual(result['message'], "Registered successfully.")
         self.assertEqual(res.status_code, 201)
 
 
     def test_already_registered_user(self):
         """Test that a user cannot be registered twice."""
-        res = self.client().post('/v1/users', data=self.user_data)
-        self.assertEqual(res.status_code, 201)
-        second_res = self.client().post('/v1/users', data=self.user_data)
-        self.assertEqual(second_res.status_code, 409)
+        res_1 = self.client().post(
+                '/v1/users',
+                content_type='application/json',
+                data=json.dumps(self.user_data)
+                )
+        res_2 = self.client().post(
+                '/v1/users',
+                content_type='application/json',
+                data=json.dumps(self.user_data)
+                )
 
-        result = json.loads(second_res.data.decode())
+        result = json.loads(res_2.data.decode())
+
         self.assertEqual(result['message'], "User already exists. Please login.")
+        self.assertEqual(res_2.status_code, 409)
 
 
     def test_login(self):
         """Test registered user can login."""
-        res = self.client().post('/v1/users', data=self.user_data)
-        self.assertEqual(res.status_code, 201)
+        res = self.client().post(
+                '/v1/users',
+                content_type='application/json',
+                data=json.dumps(self.user_data)
+                )
         login_res = self.client().post('/v1/users/login', data=self.user_data)
 
         result = json.loads(login_res.data.decode())
@@ -67,7 +79,11 @@ class AuthTestCase(unittest.TestCase):
             'password': 'nope'
         }
 
-        res = self.client().post('/v1/users/login', data=not_a_user)
+        res = self.client().post(
+                '/v1/users',
+                content_type='application/json',
+                data=json.dumps(not_a_user)
+                )
         result = json.loads(res.data.decode())
 
         self.assertEqual(res.status_code, 401)
