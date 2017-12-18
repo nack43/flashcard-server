@@ -45,7 +45,6 @@ class AuthTestCase(unittest.TestCase):
 
         result = json.loads(res.data.decode())
 
-        self.assertEqual(result['message'], "You logged in successfully.")
         self.assertEqual(res.status_code, 200)
         self.assertTrue(['access_token'])
 
