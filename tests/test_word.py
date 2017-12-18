@@ -94,8 +94,11 @@ class WordTestCase(unittest.TestCase):
 
 
     def login(self):
-        return self.client().post('/v1/users/login', data=self.user_data)
-
+        return self.client().post(
+                '/v1/authentication',
+                content_type='application/json',
+                data=json.dumps(self.user_data)
+                )
 
     def test_word_registration(self):
         """Testing for word registration normally."""

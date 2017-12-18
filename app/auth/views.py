@@ -13,6 +13,7 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user and user.password_is_valid(password):
+
         user.generate_token(user.id)
 
         if user.access_token:
