@@ -135,17 +135,19 @@ class WordTestCase(unittest.TestCase):
         self.sign_up()
         login_res = self.login()
         access_token = json.loads(login_res.data.decode())['access_token']
-        
-        res_post = self.client().post(
+
+        res = self.client().post(
                 '/v1/words', 
-                data=self.word_data,
-                headers=dict(Authorization="Bearer " + access_token)
+                headers=dict(Authorization="Bearer " + access_token),
+                content_type='application/json',
+                data=json.dumps(self.word_data)
                 )
-        
-        res_post_2 = self.client().post(
+
+        res_2 = self.client().post(
                 '/v1/words', 
-                data=self.word_data_2,
-                headers=dict(Authorization="Bearer " + access_token)
+                headers=dict(Authorization="Bearer " + access_token),
+                content_type='application/json',
+                data=json.dumps(self.word_data_2)
                 )
 
         res_get = self.client().get(
