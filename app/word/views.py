@@ -1,8 +1,9 @@
 from . import word
 
 from flask.views import MethodView
+from flask_api import status
 from flask import Blueprint, make_response, request, jsonify
-from app.models import Word, User, Part_of_speech
+from app.models import Word, User, Part_of_speech, Choice
 
 
 @word.route('/v1/words', methods=['POST'])
@@ -14,10 +15,11 @@ def word_register():
         user_id = User.decode_token(access_token)
 
         if not isinstance(user_id, str):
-            # handle pattern of the authenticated user
-            front = request.data.get('front', '')
-            back = request.data.get('back', '')
-            pos_id = request.data.get('pos_id', '')
+
+            content = request.get_json()
+            front = content['front']
+            back = content['back']
+            pos_id = content['pos_id']
 
             word = Word(
                     front=front,
@@ -28,16 +30,26 @@ def word_register():
             
             word.choice_determination(pos_id)
             word.save()
+            
+            choice_1 = Choice.query.filter_by(id=word.choice_1_id).first()
+            choice_2 = Choice.query.filter_by(id=word.choice_2_id).first()
+            choice_3 = Choice.query.filter_by(id=word.choice_3_id).first()
+
+            choices = [choice_1.choice, choice_2.choice, choice_3.choice]
 
             response = {
-                'message': 'Registered Successfully.',
-                'front': front,
-                'back': back,
-                'created_by': user_id,
-                'pos_id': pos_id
+                'id': word.id,
+                'front': word.front,
+                'back': word.back,
+                'weight': word.weight,
+                'choices': choices,
+                'created_by': word.created_by,
+                'pos_id': word.pos_id,
+                'created_at': word.created_date,
+                'modified_at': word.modified_date
             }
 
-            return make_response(jsonify(response)), 201
+            return make_response(jsonify(response)), status.HTTP_201_CREATED
 
 
 @word.route('/v1/words', methods=['GET'])

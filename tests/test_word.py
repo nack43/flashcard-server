@@ -108,8 +108,9 @@ class WordTestCase(unittest.TestCase):
 
         res = self.client().post(
                 '/v1/words', 
-                data=self.word_data,
-                headers=dict(Authorization="Bearer " + access_token)
+                headers=dict(Authorization="Bearer " + access_token),
+                content_type='application/json',
+                data=json.dumps(self.word_data)
                 )
 
         # convert response to json format
@@ -119,13 +120,13 @@ class WordTestCase(unittest.TestCase):
         self.assertEqual(res_json['front'], '你好')
         self.assertEqual(res_json['back'], 'こんにちは')
         self.assertEqual(res_json['weight'], 0)
-        self.assertIsInstance(type(res_json['choices'][0]), str)
-        self.assertIsInstance(type(res_json['choices'][1]), str)
-        self.assertIsInstance(type(res_json['choices'][2]), str)
-        self.assertIsInstance(type(res_json['created_by']), int)
-        self.assertIsInstance(type(res_json['pos_id']), 1)
-        self.assertIsInstance(type(res_json['created_at']), str)
-        self.assertIsInstance(type(res_json['modified_at']), str)
+        self.assertIs(type(res_json['choices'][0]), str)
+        self.assertIs(type(res_json['choices'][1]), str)
+        self.assertIs(type(res_json['choices'][2]), str)
+        self.assertIs(type(res_json['created_by']), int)
+        self.assertEqual(res_json['pos_id'], 1)
+        self.assertIs(type(res_json['created_at']), str)
+        self.assertIs(type(res_json['modified_at']), str)
         self.assertEqual(res.status_code, 201)
 
 
