@@ -17,7 +17,12 @@ class AuthTestCase(unittest.TestCase):
         
         self.not_a_user = {
             'email': 'not_a_user@test.com',
-            'password': 'nope'
+            'password': 'test'
+        }
+
+        self.invalid_password_user = {
+            'email': 'test@test.com',
+            'password': 'invalid_password'
         }
 
         with self.app.app_context():
@@ -59,6 +64,21 @@ class AuthTestCase(unittest.TestCase):
                 data=json.dumps(self.not_a_user)
                 )
 
+        result = json.loads(res.data.decode())
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(result['message'], "Invalid email or password.")
+
+
+    def test_invalid_password_user_login(self):
+        """Test invalid password users cannot login."""
+        self.sign_up()
+
+        res = self.client().post(
+                '/v1/authentication',
+                content_type='application/json',
+                data=json.dumps(self.invalid_password_user)
+                )
         result = json.loads(res.data.decode())
 
         self.assertEqual(res.status_code, 401)
