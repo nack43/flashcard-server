@@ -31,11 +31,11 @@ def word_register():
             word.choice_determination(pos_id)
             word.save()
             
-            choice_1 = Choice.query.filter_by(id=word.choice_1_id).first()
-            choice_2 = Choice.query.filter_by(id=word.choice_2_id).first()
-            choice_3 = Choice.query.filter_by(id=word.choice_3_id).first()
+            choice_1 = Choice.query.filter_by(id=word.choice_1_id).first().choice
+            choice_2 = Choice.query.filter_by(id=word.choice_2_id).first().choice
+            choice_3 = Choice.query.filter_by(id=word.choice_3_id).first().choice
 
-            choices = [choice_1.choice, choice_2.choice, choice_3.choice]
+            choices = [choice_1, choice_2, choice_3]
 
             response = {
                 'id': word.id,
@@ -65,21 +65,26 @@ def get_all_words():
             word_list = []
 
             for word in words:
+                choice_1 = Choice.query.filter_by(id=word.choice_1_id).first().choice
+                choice_2 = Choice.query.filter_by(id=word.choice_2_id).first().choice
+                choice_3 = Choice.query.filter_by(id=word.choice_3_id).first().choice
+                choices = [choice_1, choice_2, choice_3]
+
                 element = {
                     'id': word.id,
                     'front': word.front,
                     'back': word.back,
                     'weight': word.weight,
-                    'choice_1_id': word.choice_1_id,
-                    'choice_2_id': word.choice_2_id,
-                    'choice_3_id': word.choice_3_id,
+                    'choices': choices,
                     'created_by': word.created_by,
-                    'pos_id': word.pos_id
+                    'pos_id': word.pos_id,
+                    'created_at': word.created_date.isoformat(),
+                    'modified_at': word.modified_date.isoformat()
                 }
                 
                 word_list.append(element)
 
-            return make_response(jsonify(word_list)), 200
+            return make_response(jsonify(word_list)), status.HTTP_200_OK
 
 @word.route('/v1/poses', methods=['GET'])
 def get_all_pos():
