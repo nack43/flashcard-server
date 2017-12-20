@@ -1,5 +1,5 @@
 from . import word
-
+from datetime import datetime 
 from flask.views import MethodView
 from flask_api import status
 from flask import Blueprint, make_response, request, jsonify
@@ -45,8 +45,8 @@ def word_register():
                 'choices': choices,
                 'created_by': word.created_by,
                 'pos_id': word.pos_id,
-                'created_at': word.created_date,
-                'modified_at': word.modified_date
+                'created_at': word.created_date.isoformat(),
+                'modified_at': word.modified_date.isoformat()
             }
 
             return make_response(jsonify(response)), status.HTTP_201_CREATED
