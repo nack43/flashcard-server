@@ -115,9 +115,17 @@ class WordTestCase(unittest.TestCase):
         # convert response to json format
         res_json = json.loads(res.data.decode())
 
-        self.assertEqual(res_json['message'], 'Registered Successfully.')
+        self.assertEqual(res_json['id'], 1)
         self.assertEqual(res_json['front'], '你好')
         self.assertEqual(res_json['back'], 'こんにちは')
+        self.assertEqual(res_json['weight'], 0)
+        self.assertIsInstance(type(res_json['choices'][0]), str)
+        self.assertIsInstance(type(res_json['choices'][1]), str)
+        self.assertIsInstance(type(res_json['choices'][2]), str)
+        self.assertIsInstance(type(res_json['created_by']), int)
+        self.assertIsInstance(type(res_json['pos_id']), 1)
+        self.assertIsInstance(type(res_json['created_at']), str)
+        self.assertIsInstance(type(res_json['modified_at']), str)
         self.assertEqual(res.status_code, 201)
 
 
