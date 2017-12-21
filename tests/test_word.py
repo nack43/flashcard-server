@@ -1,5 +1,6 @@
 import unittest
 import json
+from datetime import datetime
 
 from app import create_app, db
 from app.models import Part_of_speech, Choice
@@ -160,6 +161,39 @@ class WordTestCase(unittest.TestCase):
         self.assertIn(res_json[0]['front'], '你好')
         self.assertIn(res_json[1]['front'], '早晨')
         self.assertEqual(res_get.status_code, 200)
+
+    def test_get_all_words_after_requested_modified_date(self):
+        """Testing for getting all words after requested modified date"""
+        self.sign_up()
+        login_res = self.login()
+        access_token = json.loads(login_res.data.decode())['access_token']
+
+        res_1 = self.client().post(
+                '/v1/words', 
+                headers=dict(Authorization="Bearer " + access_token),
+                content_type='application/json',
+                data=json.dumps(self.word_data)
+                )
+
+        now = datetime.now().isoformat()
+
+        res_2 = self.client().post(
+                '/v1/words', 
+                headers=dict(Authorization="Bearer " + access_token),
+                content_type='application/json',
+                data=json.dumps(self.word_data_2)
+                )
+
+        res_3 = self.client().get(
+                '/v1/words',
+                headers=dict(Authorization="Bearer " + access_token),
+                query_string=dict(modified_at=now)
+                )
+        
+        res_json = json.loads(res_3.data.decode())
+
+        self.assertIs(len(res_json), 1)
+        self.assertEqual(res_3.status_code, 200)
 
     
     def test_get_all_pos(self):
