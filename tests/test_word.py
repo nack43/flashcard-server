@@ -175,7 +175,7 @@ class WordTestCase(unittest.TestCase):
                 data=json.dumps(self.word_data)
                 )
 
-        now = datetime.now().isoformat()
+        now = datetime.utcnow().isoformat()
 
         res_2 = self.client().post(
                 '/v1/words', 

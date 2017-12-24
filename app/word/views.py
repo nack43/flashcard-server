@@ -56,35 +56,70 @@ def word_register():
 def get_all_words():
     auth_header = request.headers.get('Authorization')
     access_token = auth_header.split(' ')[1]
+    requested_modified_at = request.args.get('modified_at')
 
     if access_token:
         user_id = User.decode_token(access_token)
 
         if not isinstance(user_id, str):
-            words = Word.get_all(user_id)
-            word_list = []
 
-            for word in words:
-                choice_1 = Choice.query.filter_by(id=word.choice_1_id).first().choice
-                choice_2 = Choice.query.filter_by(id=word.choice_2_id).first().choice
-                choice_3 = Choice.query.filter_by(id=word.choice_3_id).first().choice
-                choices = [choice_1, choice_2, choice_3]
+            # get all of words
+            if requested_modified_at is None:
 
-                element = {
-                    'id': word.id,
-                    'front': word.front,
-                    'back': word.back,
-                    'weight': word.weight,
-                    'choices': choices,
-                    'created_by': word.created_by,
-                    'pos_id': word.pos_id,
-                    'created_at': word.created_date.isoformat(),
-                    'modified_at': word.modified_date.isoformat()
-                }
-                
-                word_list.append(element)
+                words = Word.get_all(user_id)
+                word_list = []
+    
+                for word in words:
+                    choice_1 = Choice.query.filter_by(id=word.choice_1_id).first().choice
+                    choice_2 = Choice.query.filter_by(id=word.choice_2_id).first().choice
+                    choice_3 = Choice.query.filter_by(id=word.choice_3_id).first().choice
+                    choices = [choice_1, choice_2, choice_3]
+    
+                    element = {
+                        'id': word.id,
+                        'front': word.front,
+                        'back': word.back,
+                        'weight': word.weight,
+                        'choices': choices,
+                        'created_by': word.created_by,
+                        'pos_id': word.pos_id,
+                        'created_at': word.created_date.isoformat(),
+                        'modified_at': word.modified_date.isoformat()
+                    }
+                    
+                    word_list.append(element)
+    
+                return make_response(jsonify(word_list)), status.HTTP_200_OK
 
-            return make_response(jsonify(word_list)), status.HTTP_200_OK
+            # get all of words after modified_at
+            else:
+                words = Word.get_all(user_id)
+                word_list = []
+    
+                for word in words:
+                    choice_1 = Choice.query.filter_by(id=word.choice_1_id).first().choice
+                    choice_2 = Choice.query.filter_by(id=word.choice_2_id).first().choice
+                    choice_3 = Choice.query.filter_by(id=word.choice_3_id).first().choice
+                    choices = [choice_1, choice_2, choice_3]
+    
+                    element = {
+                        'id': word.id,
+                        'front': word.front,
+                        'back': word.back,
+                        'weight': word.weight,
+                        'choices': choices,
+                        'created_by': word.created_by,
+                        'pos_id': word.pos_id,
+                        'created_at': word.created_date.isoformat(),
+                        'modified_at': word.modified_date.isoformat()
+                    }
+                    
+                    word_list.append(element)
+
+                word_list_after_modified = [word for word in word_list if word['modified_at'] > requested_modified_at]
+
+                return make_response(jsonify(word_list_after_modified)), status.HTTP_200_OK
+    
 
 @word.route('/v1/poses', methods=['GET'])
 def get_all_pos():
