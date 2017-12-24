@@ -4,6 +4,7 @@ from flask.views import MethodView
 from flask_api import status
 from flask import Blueprint, make_response, request, jsonify
 from app.models import Word, User, Part_of_speech, Choice
+from sqlalchemy import and_
 
 
 @word.route('/v1/words', methods=['POST'])
@@ -31,11 +32,7 @@ def word_register():
             word.choice_determination(pos_id)
             word.save()
             
-            choice_1 = Choice.query.filter_by(id=word.choice_1_id).first().choice
-            choice_2 = Choice.query.filter_by(id=word.choice_2_id).first().choice
-            choice_3 = Choice.query.filter_by(id=word.choice_3_id).first().choice
-
-            choices = [choice_1, choice_2, choice_3]
+            choices = Word.get_word_choices(word) 
 
             response = {
                 'id': word.id,
@@ -70,10 +67,8 @@ def get_all_words():
                 word_list = []
     
                 for word in words:
-                    choice_1 = Choice.query.filter_by(id=word.choice_1_id).first().choice
-                    choice_2 = Choice.query.filter_by(id=word.choice_2_id).first().choice
-                    choice_3 = Choice.query.filter_by(id=word.choice_3_id).first().choice
-                    choices = [choice_1, choice_2, choice_3]
+
+                    choices = Word.get_word_choices(word) 
     
                     element = {
                         'id': word.id,
@@ -93,14 +88,12 @@ def get_all_words():
 
             # get all of words after modified_at
             else:
-                words = Word.get_all(user_id)
+                words = Word.query.filter(and_(Word.created_by == user_id, Word.modified_date > requested_modified_at))
                 word_list = []
     
                 for word in words:
-                    choice_1 = Choice.query.filter_by(id=word.choice_1_id).first().choice
-                    choice_2 = Choice.query.filter_by(id=word.choice_2_id).first().choice
-                    choice_3 = Choice.query.filter_by(id=word.choice_3_id).first().choice
-                    choices = [choice_1, choice_2, choice_3]
+
+                    choices = Word.get_word_choices(word) 
     
                     element = {
                         'id': word.id,
@@ -116,9 +109,7 @@ def get_all_words():
                     
                     word_list.append(element)
 
-                word_list_after_modified = [word for word in word_list if word['modified_at'] > requested_modified_at]
-
-                return make_response(jsonify(word_list_after_modified)), status.HTTP_200_OK
+                return make_response(jsonify(word_list)), status.HTTP_200_OK
     
 
 @word.route('/v1/poses', methods=['GET'])
