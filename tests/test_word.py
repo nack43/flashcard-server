@@ -93,26 +93,35 @@ class WordTestCase(unittest.TestCase):
                 data=json.dumps(self.user_data)
                 )
 
-
     def login(self):
-        return self.client().post(
-                '/v1/authentication',
-                content_type='application/json',
-                data=json.dumps(self.user_data)
-                )
 
-    def test_word_registration(self):
-        """Testing for word registration normally."""
-        self.sign_up()
-        login_res = self.login()
-        access_token = json.loads(login_res.data.decode())['access_token']
+        res = self.client().post(
+            '/v1/authentication',
+            content_type='application/json',
+            data=json.dumps(self.user_data)
+            )
+
+        access_token = json.loads(res.data.decode())['access_token']
+        
+        return access_token
+
+    def word_register(self, access_token, word):
 
         res = self.client().post(
                 '/v1/words', 
                 headers=dict(Authorization="Bearer " + access_token),
                 content_type='application/json',
-                data=json.dumps(self.word_data)
+                data=json.dumps(word)
                 )
+
+        return res
+
+    def test_word_registration(self):
+        """Testing for word registration normally."""
+        self.sign_up()
+        access_token = self.login()
+
+        res = self.word_register(access_token, self.word_data)
 
         # convert response to json format
         res_json = json.loads(res.data.decode())
@@ -134,73 +143,49 @@ class WordTestCase(unittest.TestCase):
     def test_get_all_words(self):
         """Testing for getting all words user have"""
         self.sign_up()
-        login_res = self.login()
-        access_token = json.loads(login_res.data.decode())['access_token']
+        access_token = self.login()
 
-        res = self.client().post(
-                '/v1/words', 
-                headers=dict(Authorization="Bearer " + access_token),
-                content_type='application/json',
-                data=json.dumps(self.word_data)
-                )
+        self.word_register(access_token, self.word_data)
+        self.word_register(access_token, self.word_data_2)
 
-        res_2 = self.client().post(
-                '/v1/words', 
-                headers=dict(Authorization="Bearer " + access_token),
-                content_type='application/json',
-                data=json.dumps(self.word_data_2)
-                )
-
-        res_get = self.client().get(
+        res = self.client().get(
                 '/v1/words',
                 headers=dict(Authorization="Bearer " + access_token)
                 )
         
-        res_json = json.loads(res_get.data.decode())
+        res_json = json.loads(res.data.decode())
 
         self.assertIn(res_json[0]['front'], '你好')
         self.assertIn(res_json[1]['front'], '早晨')
-        self.assertEqual(res_get.status_code, 200)
+        self.assertEqual(res.status_code, 200)
 
     def test_get_all_words_after_requested_modified_date(self):
         """Testing for getting all words after requested modified date"""
         self.sign_up()
-        login_res = self.login()
-        access_token = json.loads(login_res.data.decode())['access_token']
+        access_token = self.login()
 
-        res_1 = self.client().post(
-                '/v1/words', 
-                headers=dict(Authorization="Bearer " + access_token),
-                content_type='application/json',
-                data=json.dumps(self.word_data)
-                )
+        self.word_register(access_token, self.word_data)
 
         now = datetime.utcnow().isoformat()
 
-        res_2 = self.client().post(
-                '/v1/words', 
-                headers=dict(Authorization="Bearer " + access_token),
-                content_type='application/json',
-                data=json.dumps(self.word_data_2)
-                )
+        self.word_register(access_token, self.word_data_2)
 
-        res_3 = self.client().get(
+        res = self.client().get(
                 '/v1/words',
                 headers=dict(Authorization="Bearer " + access_token),
                 query_string=dict(modified_at=now)
                 )
         
-        res_json = json.loads(res_3.data.decode())
+        res_json = json.loads(res.data.decode())
 
         self.assertIs(len(res_json), 1)
-        self.assertEqual(res_3.status_code, 200)
+        self.assertEqual(res.status_code, 200)
 
     
     def test_get_all_pos(self):
         """Testing for getting all pos (part of spheeches)"""
         self.sign_up()
-        login_res = self.login()
-        access_token = json.loads(login_res.data.decode())['access_token']
+        access_token = self.login()
 
         res = self.client().get(
             '/v1/poses',
@@ -220,8 +205,7 @@ class WordTestCase(unittest.TestCase):
         """Tesgin for receiving test result."""
 
         self.sign_up()
-        login_res = self.login()
-        access_token = json.loads(login_res.data.decode())['access_token']
+        access_token = self.login()
         
         res_1 = self.client().post(
                 '/v1/words', 
