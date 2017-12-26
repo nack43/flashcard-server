@@ -18,8 +18,14 @@ def create_app(config_name):
     # import the authentication blueprint and register it on the app
     from .user import user_blueprint
     from .word import word
+    from .auth import auth_blueprint
+    from .pos import pos_blueprint
+    from .test import test_blueprint
     app.register_blueprint(user_blueprint)
     app.register_blueprint(word)
+    app.register_blueprint(auth_blueprint)
+    app.register_blueprint(pos_blueprint)
+    app.register_blueprint(test_blueprint)
 
     return app
 
