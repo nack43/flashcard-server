@@ -1,8 +1,10 @@
 from . import word
-
+from datetime import datetime 
 from flask.views import MethodView
+from flask_api import status
 from flask import Blueprint, make_response, request, jsonify
-from app.models import Word, User, Part_of_speech
+from app.models import Word, User, Part_of_speech, Choice
+from sqlalchemy import and_
 
 
 @word.route('/v1/words', methods=['POST'])
@@ -14,10 +16,11 @@ def word_register():
         user_id = User.decode_token(access_token)
 
         if not isinstance(user_id, str):
-            # handle pattern of the authenticated user
-            front = request.data.get('front', '')
-            back = request.data.get('back', '')
-            pos_id = request.data.get('pos_id', '')
+
+            content = request.get_json()
+            front = content['front']
+            back = content['back']
+            pos_id = content['pos_id']
 
             word = Word(
                     front=front,
@@ -28,68 +31,64 @@ def word_register():
             
             word.choice_determination(pos_id)
             word.save()
+            
+            choices = Word.get_word_choices(word) 
 
             response = {
-                'message': 'Registered Successfully.',
-                'front': front,
-                'back': back,
-                'created_by': user_id,
-                'pos_id': pos_id
+                'id': word.id,
+                'front': word.front,
+                'back': word.back,
+                'weight': word.weight,
+                'choices': choices,
+                'created_by': word.created_by,
+                'pos_id': word.pos_id,
+                'created_at': word.created_date.isoformat(),
+                'modified_at': word.modified_date.isoformat()
             }
 
-            return make_response(jsonify(response)), 201
+            return make_response(jsonify(response)), status.HTTP_201_CREATED
 
 
 @word.route('/v1/words', methods=['GET'])
 def get_all_words():
     auth_header = request.headers.get('Authorization')
     access_token = auth_header.split(' ')[1]
+    requested_modified_at = request.args.get('modified_at')
 
     if access_token:
         user_id = User.decode_token(access_token)
 
         if not isinstance(user_id, str):
-            words = Word.get_all(user_id)
+
+            # get all of words
+            if requested_modified_at is None:
+                words = Word.get_all(user_id)
+
+            # get all of words after modified_at
+            else:
+                words = Word.query.filter(and_(Word.created_by == user_id, Word.modified_date > requested_modified_at))
+
             word_list = []
-
+    
             for word in words:
+
+                choices = Word.get_word_choices(word) 
+    
                 element = {
-                    'id': word.id,
-                    'front': word.front,
-                    'back': word.back,
-                    'weight': word.weight,
-                    'choice_1_id': word.choice_1_id,
-                    'choice_2_id': word.choice_2_id,
-                    'choice_3_id': word.choice_3_id,
-                    'created_by': word.created_by,
-                    'pos_id': word.pos_id
+                   'id': word.id,
+                   'front': word.front,
+                   'back': word.back,
+                   'weight': word.weight,
+                   'choices': choices,
+                   'created_by': word.created_by,
+                   'pos_id': word.pos_id,
+                   'created_at': word.created_date.isoformat(),
+                   'modified_at': word.modified_date.isoformat()
                 }
-                
+                   
                 word_list.append(element)
-
-            return make_response(jsonify(word_list)), 200
-
-@word.route('/v1/poses', methods=['GET'])
-def get_all_pos():
-    auth_header = request.headers.get('Authorization')
-    access_token = auth_header.split(' ')[1]
-
-    if access_token:
-        user_id = User.decode_token(access_token)
-
-        if not isinstance(user_id, str):
-            poses = Part_of_speech.get_all_pos()
-            pos_list = []
-
-            for pos in poses:
-                element = {
-                    'id': pos.id,
-                    'type': pos.type
-                }
-
-                pos_list.append(element)
-            
-            return make_response(jsonify(pos_list)), 200
+  
+            return make_response(jsonify(word_list)), status.HTTP_200_OK
 
 
 @word.route('/v1/tests', methods=['POST'])
