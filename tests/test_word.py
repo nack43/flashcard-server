@@ -180,27 +180,7 @@ class WordTestCase(unittest.TestCase):
 
         self.assertIs(len(res_json), 1)
         self.assertEqual(res.status_code, 200)
-
     
-    def test_get_all_pos(self):
-        """Testing for getting all pos (part of spheeches)"""
-        self.sign_up()
-        access_token = self.login()
-
-        res = self.client().get(
-            '/v1/poses',
-            headers=dict(Authorization="Bearer " + access_token)
-            )
-
-        res_json = json.loads(res.data.decode())
-
-        self.assertEqual(res_json[0]['id'], 1)
-        self.assertEqual(res_json[0]['type'], 'noun')
-        self.assertEqual(res_json[1]['id'], 2)
-        self.assertEqual(res_json[1]['type'], 'verb')
-        self.assertEqual(res.status_code, 200)
-
-
     def test_receive_test_result(self):
         """Tesgin for receiving test result."""
 
