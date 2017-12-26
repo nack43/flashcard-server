@@ -91,29 +91,6 @@ def get_all_words():
             return make_response(jsonify(word_list)), status.HTTP_200_OK
 
 
-@word.route('/v1/poses', methods=['GET'])
-def get_all_pos():
-    auth_header = request.headers.get('Authorization')
-    access_token = auth_header.split(' ')[1]
-
-    if access_token:
-        user_id = User.decode_token(access_token)
-
-        if not isinstance(user_id, str):
-            poses = Part_of_speech.get_all_pos()
-            pos_list = []
-
-            for pos in poses:
-                element = {
-                    'id': pos.id,
-                    'type': pos.type
-                }
-
-                pos_list.append(element)
-            
-            return make_response(jsonify(pos_list)), 200
-
-
 @word.route('/v1/tests', methods=['POST'])
 def get_test_result():
     auth_header = request.headers.get('Authorization')
