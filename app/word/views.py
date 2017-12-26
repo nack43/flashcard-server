@@ -62,55 +62,34 @@ def get_all_words():
 
             # get all of words
             if requested_modified_at is None:
-
                 words = Word.get_all(user_id)
-                word_list = []
-    
-                for word in words:
-
-                    choices = Word.get_word_choices(word) 
-    
-                    element = {
-                        'id': word.id,
-                        'front': word.front,
-                        'back': word.back,
-                        'weight': word.weight,
-                        'choices': choices,
-                        'created_by': word.created_by,
-                        'pos_id': word.pos_id,
-                        'created_at': word.created_date.isoformat(),
-                        'modified_at': word.modified_date.isoformat()
-                    }
-                    
-                    word_list.append(element)
-    
-                return make_response(jsonify(word_list)), status.HTTP_200_OK
 
             # get all of words after modified_at
             else:
                 words = Word.query.filter(and_(Word.created_by == user_id, Word.modified_date > requested_modified_at))
-                word_list = []
-    
-                for word in words:
 
-                    choices = Word.get_word_choices(word) 
+            word_list = []
     
-                    element = {
-                        'id': word.id,
-                        'front': word.front,
-                        'back': word.back,
-                        'weight': word.weight,
-                        'choices': choices,
-                        'created_by': word.created_by,
-                        'pos_id': word.pos_id,
-                        'created_at': word.created_date.isoformat(),
-                        'modified_at': word.modified_date.isoformat()
-                    }
-                    
-                    word_list.append(element)
+            for word in words:
 
-                return make_response(jsonify(word_list)), status.HTTP_200_OK
+                choices = Word.get_word_choices(word) 
     
+                element = {
+                   'id': word.id,
+                   'front': word.front,
+                   'back': word.back,
+                   'weight': word.weight,
+                   'choices': choices,
+                   'created_by': word.created_by,
+                   'pos_id': word.pos_id,
+                   'created_at': word.created_date.isoformat(),
+                   'modified_at': word.modified_date.isoformat()
+                }
+                   
+                word_list.append(element)
+  
+            return make_response(jsonify(word_list)), status.HTTP_200_OK
+
 
 @word.route('/v1/poses', methods=['GET'])
 def get_all_pos():
