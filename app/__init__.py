@@ -20,10 +20,12 @@ def create_app(config_name):
     from .word import word
     from .auth import auth_blueprint
     from .pos import pos_blueprint
+    from .answer import answer_blueprint
     app.register_blueprint(user_blueprint)
     app.register_blueprint(word)
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(pos_blueprint)
+    app.register_blueprint(answer_blueprint)
 
     return app
 
