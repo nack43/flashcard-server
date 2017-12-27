@@ -5,7 +5,7 @@ from app import create_app, db
 from app.models import User, Choice, Part_of_speech
 
 
-class TestTestCase(unittest.TestCase):
+class AnswerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.app = create_app(config_name='testing')
@@ -28,7 +28,7 @@ class TestTestCase(unittest.TestCase):
             'pos_id': 1
         }
 
-        self.test_results = [
+        self.answers = [
                 {
                     'word_id': 1,
                     'is_correct': False
@@ -99,8 +99,8 @@ class TestTestCase(unittest.TestCase):
         self.word_register(access_token, self.word_data_2)
 
         res = self.client().post(
-            '/v1/tests',
-            data=json.dumps(self.test_results),
+            '/v1/answers',
+            data=json.dumps(self.answers),
             content_type='application/json',
             headers=dict(Authorization="Bearer " + access_token)
             )
