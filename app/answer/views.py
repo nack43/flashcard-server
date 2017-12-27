@@ -5,7 +5,7 @@ from app.models import Word, User
 
 
 @answer_blueprint.route('/v1/answers', methods=['POST'])
-def get_test_result():
+def get_answers():
     auth_header = request.headers.get('Authorization')
     access_token = auth_header.split(' ')[1]
 
