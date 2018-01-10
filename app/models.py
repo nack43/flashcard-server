@@ -143,6 +143,14 @@ class Word(db.Model):
     def get_all(user_id):
         return Word.query.filter_by(created_by=user_id).all()
 
+    @staticmethod
+    def get_word_choices(word):
+        choice_1 = Choice.query.filter_by(id=word.choice_1_id).first().choice
+        choice_2 = Choice.query.filter_by(id=word.choice_2_id).first().choice
+        choice_3 = Choice.query.filter_by(id=word.choice_3_id).first().choice
+
+        return [choice_1, choice_2, choice_3]
+
     def save(self):
         db.session.add(self)
         db.session.commit()
