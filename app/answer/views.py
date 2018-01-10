@@ -16,10 +16,16 @@ def get_answers():
             answers = request.get_json()
 
             for answer in answers:
-                if answer['is_correct'] == False:
-                    word = Word.query.filter_by(id=answer['word_id']).first()
+
+                word = Word.query.filter_by(id=answer['word_id']).first()
+
+                if answer['is_correct'] == True:
+                    word.weight = word.weight - 1
+
+                else:
                     word.weight = word.weight + 1
-                    word.save()
+
+                word.save()
 
             return '', status.HTTP_200_OK
 
