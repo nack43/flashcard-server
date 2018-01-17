@@ -18,9 +18,9 @@ class WordTestCase(unittest.TestCase):
         }
         
         self.word_data_2 = {
-            'front': '早晨', 
-            'back': 'おはよう',
-            'pos_id': 1
+            'front': '巴士', 
+            'back': 'バス',
+            'pos_id': 2 
         }
 
         self.user_data = {
@@ -34,15 +34,15 @@ class WordTestCase(unittest.TestCase):
             db.create_all()
 
             # insert test recode for POS
-            pos_1 = Part_of_speech(type='noun')
-            pos_2 = Part_of_speech(type='verb')
+            pos_1 = Part_of_speech(type='None')
+            pos_2 = Part_of_speech(type='Noun')
             pos_1.save()
             pos_2.save()
 
             # insert test recode for Choice
-            choice_1 = Choice(choice='ニーチェ', pos_id=1)
-            choice_2 = Choice(choice='ハイデガー', pos_id=1)
-            choice_3 = Choice(choice='サルトル', pos_id=1)
+            choice_1 = Choice(choice='ニーチェ', pos_id=2)
+            choice_2 = Choice(choice='ハイデガー', pos_id=2)
+            choice_3 = Choice(choice='サルトル', pos_id=2)
             choice_1.save()
             choice_2.save()
             choice_3.save()
@@ -83,23 +83,40 @@ class WordTestCase(unittest.TestCase):
         self.sign_up()
         access_token = self.login()
 
-        res = self.word_register(access_token, self.word_data)
+        res_1 = self.word_register(access_token, self.word_data)
+        res_2 = self.word_register(access_token, self.word_data_2)
 
         # convert response to json format
-        res_json = json.loads(res.data.decode())
+        res_json_1 = json.loads(res_1.data.decode())
+        res_json_2 = json.loads(res_2.data.decode())
 
-        self.assertEqual(res_json['id'], 1)
-        self.assertEqual(res_json['front'], '你好')
-        self.assertEqual(res_json['back'], 'こんにちは')
-        self.assertEqual(res_json['weight'], 0)
-        self.assertIs(type(res_json['choices'][0]), str)
-        self.assertIs(type(res_json['choices'][1]), str)
-        self.assertIs(type(res_json['choices'][2]), str)
-        self.assertIs(type(res_json['created_by']), int)
-        self.assertEqual(res_json['pos_id'], 1)
-        self.assertIs(type(res_json['created_at']), str)
-        self.assertIs(type(res_json['modified_at']), str)
-        self.assertEqual(res.status_code, 201)
+        # in case of pos_id 1
+        self.assertEqual(res_json_1['id'], 1)
+        self.assertEqual(res_json_1['front'], '你好')
+        self.assertEqual(res_json_1['back'], 'こんにちは')
+        self.assertEqual(res_json_1['weight'], 0)
+        self.assertIs(type(res_json_1['choices'][0]), str)
+        self.assertIs(type(res_json_1['choices'][1]), str)
+        self.assertIs(type(res_json_1['choices'][2]), str)
+        self.assertIs(type(res_json_1['created_by']), int)
+        self.assertEqual(res_json_1['pos_id'], 1)
+        self.assertIs(type(res_json_1['created_at']), str)
+        self.assertIs(type(res_json_1['modified_at']), str)
+        self.assertEqual(res_1.status_code, 201)
+
+        # in case of pos_id except for 1
+        self.assertEqual(res_json_2['id'], 2)
+        self.assertEqual(res_json_2['front'], '巴士')
+        self.assertEqual(res_json_2['back'], 'バス')
+        self.assertEqual(res_json_2['weight'], 0)
+        self.assertIs(type(res_json_2['choices'][0]), str)
+        self.assertIs(type(res_json_2['choices'][1]), str)
+        self.assertIs(type(res_json_2['choices'][2]), str)
+        self.assertIs(type(res_json_2['created_by']), int)
+        self.assertEqual(res_json_2['pos_id'], 2)
+        self.assertIs(type(res_json_2['created_at']), str)
+        self.assertIs(type(res_json_2['modified_at']), str)
+        self.assertEqual(res_2.status_code, 201)
 
 
     def test_get_all_words(self):
@@ -118,7 +135,7 @@ class WordTestCase(unittest.TestCase):
         res_json = json.loads(res.data.decode())
 
         self.assertIn(res_json[0]['front'], '你好')
-        self.assertIn(res_json[1]['front'], '早晨')
+        self.assertIn(res_json[1]['front'], '巴士')
         self.assertEqual(res.status_code, 200)
 
     def test_get_all_words_after_requested_modified_date(self):

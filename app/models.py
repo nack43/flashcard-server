@@ -133,7 +133,14 @@ class Word(db.Model):
         self.pos_id = pos_id
 
     def choice_determination(self, pos_id):
-        choice_list = Choice.query.filter_by(pos_id=pos_id).all()
+
+        # 1 = None
+        if pos_id == 1:
+            choice_list = Choice.query.all()
+
+        else:
+            choice_list = Choice.query.filter_by(pos_id=pos_id).all()
+
         random.shuffle(choice_list)
         self.choice_1_id = choice_list[0].id
         self.choice_2_id = choice_list[1].id
