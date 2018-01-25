@@ -63,6 +63,8 @@ class DecoratorTestCase(unittest.TestCase):
             '/v1/poses'
             )
 
+        res_json = json.loads(res.data.decode())
+
         self.assertEqual(res_json['message'], 'No Authorization header')
         self.assertEqual(res.status_code, 401)
             
