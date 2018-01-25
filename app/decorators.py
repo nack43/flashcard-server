@@ -4,7 +4,7 @@ from flask import make_response, request, jsonify
 
 def token_auth(func):
     
-    def _wrap(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         if 'Authorization' not in request.headers:
             
             response = {
@@ -29,8 +29,6 @@ def token_auth(func):
 
                 return jsonify(response), status.HTTP_401_UNAUTHORIZED
 
-    return _wrap
-
-
+    return wrapper
 
 
