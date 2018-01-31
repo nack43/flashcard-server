@@ -159,4 +159,37 @@ class WordTestCase(unittest.TestCase):
 
         self.assertIs(len(res_json), 1)
         self.assertEqual(res.status_code, 200)
+
+
+    def test_word_delete(self):
+
+        self.sign_up()
+        access_token = self.login()
+        
+        self.word_register(access_token, self.word_data)
+
+        res = self.client().delete(
+                '/v1/words',
+                headers=dict(Authorization="Bearer " + access_token),
+                query_string=dict(word_id=1)
+                )
+
+        self.assertEqual(res.status_code, 204)
+
+
+    def test_word_delete_does_not_exist(self):
+
+        self.sign_up()
+        access_token = self.login()
+        
+        self.word_register(access_token, self.word_data)
+
+        # word_id 2 does not exist
+        res = self.client().delete(
+                '/v1/words',
+                headers=dict(Authorization="Bearer " + access_token),
+                query_string=dict(word_id=2)
+                )
+
+        self.assertEqual(res.status_code, 404)
     
