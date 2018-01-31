@@ -2,30 +2,25 @@ from . import answer_blueprint
 from flask_api import status
 from flask import Blueprint, make_response, request, jsonify
 from app.models import Word, User
+from app.decorators import token_auth
 
 
 @answer_blueprint.route('/v1/answers', methods=['POST'])
+@token_auth
 def get_answers():
-    auth_header = request.headers.get('Authorization')
-    access_token = auth_header.split(' ')[1]
+    answers = request.get_json()
 
-    if access_token:
-        user_id = User.decode_token(access_token)
+    for answer in answers:
 
-        if not isinstance(user_id, str):
-            answers = request.get_json()
+        word = Word.query.filter_by(id=answer['word_id']).first()
 
-            for answer in answers:
+        if answer['is_correct'] == True:
+            word.weight = word.weight - 1
 
-                word = Word.query.filter_by(id=answer['word_id']).first()
+        else:
+            word.weight = word.weight + 1
 
-                if answer['is_correct'] == True:
-                    word.weight = word.weight - 1
+        word.save()
 
-                else:
-                    word.weight = word.weight + 1
-
-                word.save()
-
-            return '', status.HTTP_200_OK
+    return '', status.HTTP_200_OK
 
