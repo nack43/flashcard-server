@@ -8,7 +8,7 @@ from sqlalchemy import and_
 from app.decorators import token_auth
 
 
-@word.route('/v1/words', methods=['POST', 'GET'])
+@word.route('/v1/words', methods=['POST', 'GET', 'DELETE'])
 @token_auth
 def word():
 
@@ -83,4 +83,20 @@ def word():
             word_list.append(element)
  
         return make_response(jsonify(word_list)), status.HTTP_200_OK
+
+    elif request.method == 'DELETE':
+
+        word_id = request.get_json()['word_id']
+
+        word = Word.query.filter_by(id=word_id).first()
+
+        if word:
+            word.delete()
+            
+            return '', status.HTTP_204_NO_CONTENT
+
+        else:
+
+            return '', status.HTTP_404_NOT_FOUND
+
 
