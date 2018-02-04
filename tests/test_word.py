@@ -171,8 +171,7 @@ class WordTestCase(unittest.TestCase):
         res = self.client().delete(
                 '/v1/words',
                 headers=dict(Authorization="Bearer " + access_token),
-                content_type='application/json',
-                data=json.dumps(dict(word_id=1))
+                query_string=dict(word_id=1)
                 )
 
         self.assertEqual(res.status_code, 204)
@@ -189,8 +188,7 @@ class WordTestCase(unittest.TestCase):
         res = self.client().delete(
                 '/v1/words',
                 headers=dict(Authorization="Bearer " + access_token),
-                content_type='application/json',
-                data=json.dumps(dict(word_id=2))
+                query_string=dict(word_id=2)
                 )
 
         self.assertEqual(res.status_code, 404)
