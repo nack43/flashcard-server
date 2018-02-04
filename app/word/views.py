@@ -86,7 +86,7 @@ def word():
 
     elif request.method == 'DELETE':
 
-        word_id = request.get_json()['word_id']
+        word_id = request.args.get('word_id')
 
         word = Word.query.filter_by(id=word_id).first()
 
