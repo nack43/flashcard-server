@@ -10,12 +10,19 @@ from app.decorators import token_auth
 
 class WordAPI(MethodView):
 
-    def get(self):
-   
-        # get a user_id from access_token
+    # get user id from access token
+    def get_user_id(self):
         auth_header = request.headers.get('Authorization')
         access_token = auth_header.split(' ')[1]
         user_id = User.decode_token(access_token)
+
+        return user_id
+
+
+    def get(self):
+   
+        # get a user_id from access_token
+        user_id = self.get_user_id() 
 
         requested_modified_at = request.args.get('modified_at')
 
@@ -101,9 +108,11 @@ class WordAPI(MethodView):
 
             return '', status.HTTP_404_NOT_FOUND
 
+
 # Add decorator to each function in WordAPI class
 word_view = token_auth(WordAPI.as_view('word_api'))
 
+# Add url to the blueprint
 word.add_url_rule('/v1/words', view_func=word_view, methods=['GET', 'POST'])
 word.add_url_rule('/v1/words/<int:id>', view_func=word_view, methods=['DELETE'])
 
