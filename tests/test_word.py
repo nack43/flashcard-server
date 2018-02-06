@@ -169,10 +169,8 @@ class WordTestCase(unittest.TestCase):
         self.word_register(access_token, self.word_data)
 
         res = self.client().delete(
-                '/v1/words',
-                headers=dict(Authorization="Bearer " + access_token),
-                content_type='application/json',
-                data=json.dumps(dict(word_id=1))
+                '/v1/words/1',
+                headers=dict(Authorization="Bearer " + access_token)
                 )
 
         self.assertEqual(res.status_code, 204)
@@ -187,10 +185,8 @@ class WordTestCase(unittest.TestCase):
 
         # word_id 2 does not exist
         res = self.client().delete(
-                '/v1/words',
-                headers=dict(Authorization="Bearer " + access_token),
-                content_type='application/json',
-                data=json.dumps(dict(word_id=2))
+                '/v1/words/2',
+                headers=dict(Authorization="Bearer " + access_token)
                 )
 
         self.assertEqual(res.status_code, 404)

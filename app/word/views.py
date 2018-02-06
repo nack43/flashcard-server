@@ -8,49 +8,21 @@ from sqlalchemy import and_
 from app.decorators import token_auth
 
 
-@word.route('/v1/words', methods=['POST', 'GET', 'DELETE'])
-@token_auth
-def word():
+class WordAPI(MethodView):
 
-    # get a user_id from access_token
-    auth_header = request.headers.get('Authorization')
-    access_token = auth_header.split(' ')[1]
-    user_id = User.decode_token(access_token)
+    # get user id from access token
+    def get_user_id(self):
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(' ')[1]
+        user_id = User.decode_token(access_token)
 
-    if request.method == 'POST':
+        return user_id
 
-        content = request.get_json()
-        front = content['front']
-        back = content['back']
-        pos_id = content['pos_id']
 
-        word = Word(
-                front=front,
-                back=back,
-                created_by=user_id,
-                pos_id=pos_id
-            )
-        
-        word.choice_determination(pos_id)
-        word.save()
-        
-        choices = Word.get_word_choices(word) 
-
-        response = {
-            'id': word.id,
-            'front': word.front,
-            'back': word.back,
-            'weight': word.weight,
-            'choices': choices,
-            'created_by': word.created_by,
-            'pos_id': word.pos_id,
-            'created_at': word.created_date.isoformat(),
-            'modified_at': word.modified_date.isoformat()
-        }
-
-        return make_response(jsonify(response)), status.HTTP_201_CREATED
-
-    elif request.method == 'GET':
+    def get(self):
+   
+        # get a user_id from access_token
+        user_id = self.get_user_id() 
 
         requested_modified_at = request.args.get('modified_at')
 
@@ -84,11 +56,48 @@ def word():
  
         return make_response(jsonify(word_list)), status.HTTP_200_OK
 
-    elif request.method == 'DELETE':
 
-        word_id = request.get_json()['word_id']
+    def post(self):
+        # get a user_id from access_token
+        auth_header = request.headers.get('Authorization')
+        access_token = auth_header.split(' ')[1]
+        user_id = User.decode_token(access_token)
 
-        word = Word.query.filter_by(id=word_id).first()
+        content = request.get_json()
+        front = content['front']
+        back = content['back']
+        pos_id = content['pos_id']
+
+        word = Word(
+                front=front,
+                back=back,
+                created_by=user_id,
+                pos_id=pos_id
+            )
+        
+        word.choice_determination(pos_id)
+        word.save()
+        
+        choices = Word.get_word_choices(word) 
+
+        response = {
+            'id': word.id,
+            'front': word.front,
+            'back': word.back,
+            'weight': word.weight,
+            'choices': choices,
+            'created_by': word.created_by,
+            'pos_id': word.pos_id,
+            'created_at': word.created_date.isoformat(),
+            'modified_at': word.modified_date.isoformat()
+        }
+
+        return make_response(jsonify(response)), status.HTTP_201_CREATED
+
+
+    def delete(self, id):
+
+        word = Word.query.filter_by(id=id).first()
 
         if word:
             word.delete()
@@ -98,5 +107,13 @@ def word():
         else:
 
             return '', status.HTTP_404_NOT_FOUND
+
+
+# Add decorator to each function in WordAPI class
+word_view = token_auth(WordAPI.as_view('word_api'))
+
+# Add url to the blueprint
+word.add_url_rule('/v1/words', view_func=word_view, methods=['GET', 'POST'])
+word.add_url_rule('/v1/words/<int:id>', view_func=word_view, methods=['DELETE'])
 
 
