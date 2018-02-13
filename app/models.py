@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import jwt
 from flask_bcrypt import Bcrypt
 from flask import current_app
+from sqlalchemy import and_
 # local import
 from app import db
 
@@ -132,14 +133,14 @@ class Word(db.Model):
         self.created_by = created_by
         self.pos_id = pos_id
 
-    def choice_determination(self, pos_id):
+    def choice_determination(self, pos_id, back):
 
         # 1 = None
         if pos_id == 1:
             choice_list = Choice.query.all()
 
         else:
-            choice_list = Choice.query.filter_by(pos_id=pos_id).all()
+            choice_list = Choice.query.filter(and_(Choice.pos_id==pos_id, Choice.choice!=back)).all()
 
         random.shuffle(choice_list)
         self.choice_1_id = choice_list[0].id
