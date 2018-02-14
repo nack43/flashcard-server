@@ -75,7 +75,7 @@ class WordAPI(MethodView):
                 pos_id=pos_id
             )
         
-        word.choice_determination(pos_id)
+        word.choice_determination(pos_id, back)
         word.save()
         
         choices = Word.get_word_choices(word) 
