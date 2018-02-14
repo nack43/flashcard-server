@@ -19,7 +19,7 @@ class WordTestCase(unittest.TestCase):
         
         self.word_data_2 = {
             'front': '巴士', 
-            'back': 'バス',
+            'back': 'bus',
             'pos_id': 2 
         }
 
@@ -40,12 +40,14 @@ class WordTestCase(unittest.TestCase):
             pos_2.save()
 
             # insert test recode for Choice
-            choice_1 = Choice(choice='ニーチェ', pos_id=2)
-            choice_2 = Choice(choice='ハイデガー', pos_id=2)
-            choice_3 = Choice(choice='サルトル', pos_id=2)
+            choice_1 = Choice(choice='bus', pos_id=2)
+            choice_2 = Choice(choice='car', pos_id=2)
+            choice_3 = Choice(choice='cat', pos_id=2)
+            choice_4 = Choice(choice='dog', pos_id=2)
             choice_1.save()
             choice_2.save()
             choice_3.save()
+            choice_4.save()
             
 
     def sign_up(self):
@@ -74,6 +76,15 @@ class WordTestCase(unittest.TestCase):
                 headers=dict(Authorization="Bearer " + access_token),
                 content_type='application/json',
                 data=json.dumps(word)
+                )
+
+        return res
+
+    def word_delete(self, access_token, word_id):
+
+        res = self.client().delete(
+                '/v1/words/{}'.format(word_id),
+                headers=dict(Authorization="Bearer " + access_token)
                 )
 
         return res
@@ -107,7 +118,7 @@ class WordTestCase(unittest.TestCase):
         # in case of pos_id except for 1
         self.assertEqual(res_json_2['id'], 2)
         self.assertEqual(res_json_2['front'], '巴士')
-        self.assertEqual(res_json_2['back'], 'バス')
+        self.assertEqual(res_json_2['back'], 'bus')
         self.assertEqual(res_json_2['weight'], 0)
         self.assertIs(type(res_json_2['choices'][0]), str)
         self.assertIs(type(res_json_2['choices'][1]), str)
@@ -190,4 +201,23 @@ class WordTestCase(unittest.TestCase):
                 )
 
         self.assertEqual(res.status_code, 404)
-    
+
+
+    def test_choice_duplication(self):
+        self.sign_up()
+        access_token = self.login()
+
+        for x in range(10):
+
+            # register
+            res = self.word_register(access_token, self.word_data_2)
+            res_json = json.loads(res.data.decode())
+            
+            # assertion
+            for y in range(3):
+                self.assertNotIn(res_json['choices'][y], 'bus')
+
+            # delete
+            self.word_delete(access_token, 1)
+
+

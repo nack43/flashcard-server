@@ -137,12 +137,13 @@ class Word(db.Model):
 
         # 1 = None
         if pos_id == 1:
-            choice_list = Choice.query.all()
+            choice_list = Choice.query.filter(Choice.choice!=back).all()
 
         else:
             choice_list = Choice.query.filter(and_(Choice.pos_id==pos_id, Choice.choice!=back)).all()
 
         random.shuffle(choice_list)
+
         self.choice_1_id = choice_list[0].id
         self.choice_2_id = choice_list[1].id
         self.choice_3_id = choice_list[2].id
